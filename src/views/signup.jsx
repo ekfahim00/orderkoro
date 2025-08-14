@@ -1,35 +1,23 @@
 import { useState } from "react";
-import { auth, db } from "../firebase/firebase.config";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { handleSignup } from "../controllers/authController";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user"); // default role
+  const [role, setRole] = useState("user");
   const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // Save user role in Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        email,
-        role,
-      });
-
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } catch (error) {
-      alert(error.message);
+      await handleSignup(email, password, role);
+      if (role === "user") navigate("/dashboard/user");
+      else navigate("/dashboard/restaurant");
+    } catch (err) {
+      alert("Signup failed: " + err.message);
     }
   };
-
   return (
     <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Signup</h2>

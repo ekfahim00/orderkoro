@@ -1,0 +1,17 @@
+export const defaultRestaurant = {
+  restaurantId: "",              
+  name: "",                      
+  address: "",                   
+  logo: "",                      
+  cover: "",                     
+  gallery: {},                   
+  rating: 0,                     
+  open: true,                    
+  openingTime: "09:00",          
+  closingTime: "22:00",
+  menus: {},                     
+  totalOrders: 0,                
+  totalReviews: 0,               
+  ownerId: "",                   
+  createdAt: Date.now(),         
+};
