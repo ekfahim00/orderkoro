@@ -6,35 +6,53 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
+  const [name, setName] = useState("");
+  const [contact, setContact] = useState("");
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      await handleSignup(email, password, role);
+      await handleSignup(email, password, role, name, contact);
       if (role === "user") navigate("/dashboard/user");
       else navigate("/dashboard/restaurant");
     } catch (err) {
       alert("Signup failed: " + err.message);
     }
   };
+
   return (
     <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Signup</h2>
-      <form onSubmit={handleSignup} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
+        <input
+          type="text"
+          placeholder="Full Name"
+          className="w-full border px-3 py-2"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Contact Number"
+          className="w-full border px-3 py-2"
+          value={contact}
+          onChange={(e) => setContact(e.target.value)}
+          required
+        />
         <input
           type="email"
-          className="w-full border px-3 py-2"
           placeholder="Email"
+          className="w-full border px-3 py-2"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-
         <input
           type="password"
-          className="w-full border px-3 py-2"
           placeholder="Password"
+          className="w-full border px-3 py-2"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -61,7 +79,7 @@ function Signup() {
           </label>
         </div>
 
-        <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded">
+        <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded w-full">
           Create Account
         </button>
       </form>

@@ -12,7 +12,10 @@ export const defaultOrder = {
   ],
   total: 0,
   orderType: "delivery",
-  status: "pending",
+  status: "placed", // places - accepted - preparing - ready- delivered / cancel
+  history: [
+    { status: "placed", timestamp: Date.now() }
+  ],
   placedAt: Date.now(),
   updatedAt: Date.now()
 };
