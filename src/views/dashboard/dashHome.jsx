@@ -1,13 +1,13 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { auth } from "../../firebase/firebase.config";
 import { getRestaurantInfo } from "../../controllers/restaurantController";
 import dayjs from "dayjs";
-import html2pdf from "html2pdf.js";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import DashboardReport from "./reportdownload";
 
 function DashHome() {
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
-  const reportRef = useRef();
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -20,27 +20,24 @@ function DashHome() {
     fetchInfo();
   }, []);
 
-  const handlePrintPDF = () => {
-    if (!reportRef.current) return;
-    html2pdf().from(reportRef.current).save("restaurant_report.pdf");
-  };
-
   if (loading || !restaurant) return <p className="p-4">Loading dashboard...</p>;
 
   return (
     <div className="p-6 space-y-6 max-w-5xl mx-auto">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold">Dashboard</h2>
-        <button
-          onClick={handlePrintPDF}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-        >
-          Download Report (PDF)
-        </button>
+        {restaurant && (
+          <PDFDownloadLink
+            document={<DashboardReport restaurant={restaurant} />}
+            fileName="restaurant_report.pdf"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          >
+            {({ loading }) => (loading ? "Preparing..." : "Download Report (PDF)")}
+          </PDFDownloadLink>
+        )}
       </div>
 
-      <div ref={reportRef} className="space-y-10">
-
+      <div className="space-y-10">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="bg-white shadow p-4 rounded">
             <h4 className="font-semibold">Total Orders</h4>

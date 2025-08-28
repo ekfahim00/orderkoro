@@ -14,6 +14,8 @@ import { auth } from "../firebase/firebase.config";
 import RestaurantInfo from "./dashboard/InfoTab";
 import InfoTab from "./dashboard/InfoTab";
 import DashboardHome from "./dashboard/dashHome";
+import LiveOrders from "./dashboard/liveOrders";
+import AllOrders from "./dashboard/allOrders";
 
 function RestaurantDashboard() {
   const [activeTab, setActiveTab] = useState("Live Orders");
@@ -90,27 +92,9 @@ function RestaurantDashboard() {
         <div className="bg-white rounded-lg shadow p-6 min-h-[300px] transition-all duration-300">
           <h2 className="text-2xl font-semibold mb-4">{activeTab}</h2>
 
-          {activeTab === "Live Orders" && (
-            <div className="text-center text-gray-500 text-lg">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/10437/10437645.png"
-                alt="No Orders"
-                className="w-32 mx-auto mb-2"
-              />
-              No Live Orders
-            </div>
-          )}
+          {activeTab === "Live Orders" && <LiveOrders/>}
 
-          {activeTab === "Active Orders" && (
-            <div className="text-center text-gray-500 text-lg">
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/860/860782.png"
-                alt="No Accepted Orders"
-                className="w-32 mx-auto mb-2"
-              />
-              No Active Orders
-            </div>
-          )}
+          {activeTab === "Active Orders" && <AllOrders/>}
 
           {activeTab === "Dashboard" && <DashboardHome />}
 

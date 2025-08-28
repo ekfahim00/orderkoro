@@ -12,7 +12,7 @@ export const defaultOrder = {
   ],
   total: 0,
   orderType: "delivery",
-  status: "placed", // places - accepted - preparing - ready- delivered / cancel
+  status: "placed", // incoming  - preparing - ready- delivered / cancel
   history: [
     { status: "placed", timestamp: Date.now() }
   ],
