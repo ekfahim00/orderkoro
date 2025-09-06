@@ -16,6 +16,7 @@ import InfoTab from "./dashboard/InfoTab";
 import DashboardHome from "./dashboard/dashHome";
 import LiveOrders from "./dashboard/liveOrders";
 import AllOrders from "./dashboard/allOrders";
+import MenuTab from "./dashboard/menuTab";
 
 function RestaurantDashboard() {
   const [activeTab, setActiveTab] = useState("Live Orders");
@@ -98,9 +99,7 @@ function RestaurantDashboard() {
 
           {activeTab === "Dashboard" && <DashboardHome />}
 
-          {activeTab === "Menu" && (
-            <p className="text-gray-600">Manage your menu items here.</p>
-          )}
+          {activeTab === "Menu" && <MenuTab/>}
 
           {activeTab === "Status" && (
             <p className="text-gray-600">
