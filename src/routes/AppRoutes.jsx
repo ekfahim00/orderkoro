@@ -1,29 +1,28 @@
-import { Routes, Route, Navigate } from "react-router-dom"; 
-import Signup from "../views/signup";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Signup from "../views/Signup";
 import Login from "../views/Login";
 import UserDashboard from "../views/UserDashboard";
 import RestaurantDashboard from "../views/RestaurantDashboard";
-import App from "../App";
+import RestaurantDetailsViewForUser from "../views/RestaurentDetailsViewForUser";
+import Home from "../views/Home";
 
 function AppRoutes({ currentUser }) {
   return (
     <Routes>
-      <Route path="/" element={<App />} />
+      {/* Public routes */}
+      <Route path="/" element={<Home/>} />
+      <Route path="/r/:id" element={<RestaurantDetailsViewForUser/>} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/login" element={<Login />} />
 
-      {/* Protected Routes */}
+      {/* Protected routes */}
       <Route
         path="/dashboard/user"
-        element={
-          currentUser ? <UserDashboard /> : <Navigate to="/login" />
-        }
+        element={currentUser ? <UserDashboard /> : <Navigate to="/login" />}
       />
       <Route
         path="/dashboard/restaurant"
-        element={
-          currentUser ? <RestaurantDashboard /> : <Navigate to="/login" />
-        }
+        element={currentUser ? <RestaurantDashboard /> : <Navigate to="/login" />}
       />
     </Routes>
   );
