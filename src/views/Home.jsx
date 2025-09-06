@@ -11,8 +11,13 @@ function RestaurantCard({ r, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="text-left rounded-lg overflow-hidden bg-white shadow hover:shadow-lg transition-all duration-200"
+      className="relative text-left rounded-lg overflow-hidden bg-white shadow hover:shadow-lg transition-all duration-200 group"
+      title={open ? "Open" : "Closed"}
     >
+      {!open && (
+        <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none" />
+      )}
+
       {/* Cover */}
       <div className="relative h-36 w-full bg-gray-100">
         {cover ? (
@@ -33,7 +38,7 @@ function RestaurantCard({ r, onClick }) {
       </div>
 
       {/* Body */}
-      <div className="p-3">
+      <div className="p-3 relative z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden">
             {logo ? (
@@ -46,7 +51,9 @@ function RestaurantCard({ r, onClick }) {
           </div>
           <div className="flex-1">
             <p className="font-semibold leading-tight">{r.name || "Unnamed"}</p>
-            <p className="text-xs text-gray-500 truncate">{r.address || "No address"}</p>
+            <p className="text-xs text-gray-500 truncate">
+              {r.address || "No address"}
+            </p>
           </div>
         </div>
 

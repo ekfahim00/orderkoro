@@ -260,10 +260,16 @@ export default function RestaurantDetailsViewForUser() {
                         <div className="flex items-center gap-2">
                           {!inCart ? (
                             <button
-                              disabled={disabled}
-                              onClick={() => addToCart(it)}
+                              disabled={disabled || !open}
+                              onClick={() => {
+                                if (!open) {
+                                  alert("Sorry, this store is closed right now.");
+                                  return;
+                                }
+                                addToCart(it);
+                              }}
                               className={`px-3 py-1.5 rounded text-sm ${
-                                disabled
+                                disabled || !open
                                   ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                                   : "bg-purple-600 text-white hover:bg-purple-700"
                               }`}
@@ -391,13 +397,19 @@ export default function RestaurantDetailsViewForUser() {
                       <span>{money(total)}</span>
                     </div>
 
-                    {/* Single, correct button — opens modal */}
                     <button
-                      onClick={() => setShowCheckout(true)}
+                      onClick={() => {
+                        if (!open) {
+                          alert("Sorry, this store is closed right now.");
+                          return;
+                        }
+                        setShowCheckout(true);
+                      }}
                       className="mt-3 w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
                     >
                       Place Order
                     </button>
+
                   </div>
                 </>
               )}
