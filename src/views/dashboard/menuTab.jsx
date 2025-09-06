@@ -91,11 +91,6 @@ export default function MenuTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Menu</h2>
-        {saving && <span className="text-sm text-gray-500">Saving…</span>}
-      </div>
 
       {/* Add item form */}
       <form

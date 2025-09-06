@@ -124,3 +124,31 @@ export const getAllOrdersOnce = async (restaurantId) => {
     .map((d) => ({ id: d.id, ...d.data() }))
     .sort((a, b) => b.placedAt - a.placedAt);
 };
+
+export const subscribeUserOrders = (userId, onData, onErr) => {
+  const q = query(
+    collection(db, "orders"),
+    where("customerId", "==", userId)
+    //  add orderBy("placedAt","desc") and accept Firestore's index prompt
+  );
+  return onSnapshot(
+    q,
+    (snap) => {
+      const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      // client-side sort: newest first
+      list.sort((a, b) => (b.placedAt || 0) - (a.placedAt || 0));
+      onData(list);
+    },
+    onErr
+  );
+};
+
+// Allow customer to rate a delivered order
+export const rateOrder = async (orderId, stars, reviewText = "") => {
+  const ref = doc(db, "orders", orderId);
+  await updateDoc(ref, {
+    rating: Number(stars),
+    reviewText,
+    updatedAt: Date.now(),
+  });
+};

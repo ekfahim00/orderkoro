@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { auth } from "../../firebase/firebase.config";
-import { getRestaurantInfo } from "../../controllers/restaurantController";
+import { auth, db } from "../../firebase/firebase.config";
+import { doc, onSnapshot } from "firebase/firestore";
 import { subscribeAllOrders } from "../../controllers/orderController";
 import dayjs from "dayjs";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -10,36 +10,61 @@ const money = (n) => `৳${Number(n || 0).toFixed(2)}`;
 
 export default function DashHome() {
   const [restaurant, setRestaurant] = useState(null);
-  const [orders, setOrders] = useState(null); // all orders for this restaurant (live subscription)
+  const [orders, setOrders] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchInfo = async () => {
-      const ownerId = auth.currentUser?.uid;
-      if (!ownerId) return;
-      const data = await getRestaurantInfo(ownerId);
-      setRestaurant(data);
-      setLoading(false);
+    let unsubDoc;
+    const ensure = (uid) => {
+      if (!uid) return;
+      unsubDoc = onSnapshot(doc(db, "restaurants", uid), (snap) => {
+        setRestaurant(snap.data() || null);
+        setLoading(false);
+      });
     };
-    fetchInfo();
+
+    const uidNow = auth.currentUser?.uid;
+    if (uidNow) {
+      ensure(uidNow);
+    } else {
+      const off = auth.onAuthStateChanged((u) => {
+        if (u?.uid) ensure(u.uid);
+      });
+      return () => off();
+    }
+    return () => unsubDoc && unsubDoc();
   }, []);
 
-  //  Subscribe to all orders for this restaurant 
+  // Live subscribe to ALL orders for this restaurant (used for metrics)
   useEffect(() => {
-    const ownerId = auth.currentUser?.uid;
-    if (!ownerId) return;
-    const unsub = subscribeAllOrders(
-      ownerId,
-      (list) => setOrders(list || []),
-      (err) => {
-        console.error(err);
-        setOrders([]);
-      }
-    );
-    return () => unsub && unsub();
+    let unsubOrders;
+    const attach = (uid) => {
+      unsubOrders = subscribeAllOrders(
+        uid,
+        (list) => setOrders(list || []),
+        (err) => {
+          console.error("orders sub error:", err);
+          setOrders([]);
+        }
+      );
+    };
+
+    const uidNow = auth.currentUser?.uid;
+    if (uidNow) {
+      attach(uidNow);
+      return () => unsubOrders && unsubOrders();
+    } else {
+      const off = auth.onAuthStateChanged((u) => {
+        if (u?.uid) attach(u.uid);
+      });
+      return () => {
+        off();
+        unsubOrders && unsubOrders();
+      };
+    }
   }, []);
 
-  //Compute aggregates for tiles + performance
+  // Compute aggregates
   const stats = useMemo(() => {
     if (!orders) return null;
 
@@ -56,7 +81,6 @@ export default function DashHome() {
     const inRange = (o, start, end) =>
       typeof o.placedAt === "number" && o.placedAt >= start && o.placedAt < end;
 
-    // Only count delivered in revenue 
     const this7 = delivered.filter((o) => inRange(o, startThis7, now));
     const prev7 = delivered.filter((o) => inRange(o, startPrev7, endPrev7));
 
@@ -66,9 +90,6 @@ export default function DashHome() {
     const prev7Orders = prev7.length;
     const prev7Revenue = prev7.reduce((s, o) => s + Number(o.total || 0), 0);
 
-    const ordersDiff = this7Orders - prev7Orders;
-    const revenueDiff = this7Revenue - prev7Revenue;
-
     return {
       totalOrders,
       totalRevenue,
@@ -76,8 +97,8 @@ export default function DashHome() {
       this7Revenue,
       prev7Orders,
       prev7Revenue,
-      ordersDiff,
-      revenueDiff,
+      ordersDiff: this7Orders - prev7Orders,
+      revenueDiff: this7Revenue - prev7Revenue,
     };
   }, [orders]);
 
@@ -110,11 +131,15 @@ export default function DashHome() {
         </div>
         <div className="bg-white shadow p-4 rounded">
           <h4 className="font-semibold">Rating</h4>
-          <p className="text-2xl">{Number(restaurant.rating ?? 0).toFixed(1)} / 5</p>
+          <p className="text-2xl">
+            {Number(restaurant.rating ?? 0).toFixed(2)} / 5
+            <span className="text-sm text-gray-500 ml-2">
+              ({restaurant.totalReviews ?? 0})
+            </span>
+          </p>
         </div>
       </div>
 
-      {/* Best sellers placeholder */}
       <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
         <h4 className="text-xl font-semibold mb-2">Best Selling Items</h4>
         <ul className="list-disc pl-5 text-gray-700">
@@ -124,7 +149,6 @@ export default function DashHome() {
         </ul>
       </div>
 
-      {/* Performance section */}
       <div className="bg-white shadow p-4 rounded space-y-4">
         <h4 className="text-xl font-semibold">Performance</h4>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -146,7 +170,6 @@ export default function DashHome() {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="pt-8 border-t">
         <h4 className="text-sm text-gray-600">
           Report generated on {dayjs().format("MMMM D, YYYY h:mm A")}

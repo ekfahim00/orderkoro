@@ -121,6 +121,7 @@ export default function RestaurantDetailsViewForUser() {
         <SiteHeader />
         <main className="max-w-6xl mx-auto px-4 py-6">Loading…</main>
       </div>
+      
     );
   }
 
@@ -152,6 +153,14 @@ export default function RestaurantDetailsViewForUser() {
       <SiteHeader />
 
       <main className="max-w-6xl mx-auto px-4 py-6">
+      <div className="flex items-center justify-between mb-4">
+        <button
+          onClick={() => navigate(-1)}
+          className="px-3 py-1.5 rounded border hover:bg-gray-50"
+        >
+          ← Back
+        </button>
+        </div>
         {/* Header card */}
         <div className="rounded-xl overflow-hidden bg-white shadow">
           <div className="relative h-52 w-full bg-gray-100">
@@ -193,14 +202,6 @@ export default function RestaurantDetailsViewForUser() {
                   Hours: {r.openingTime || "--:--"} – {r.closingTime || "--:--"}
                 </span>
               </div>
-            </div>
-            <div className="text-right">
-              <button
-                className="text-sm text-gray-600 underline"
-                onClick={() => navigate(-1)}
-              >
-                ← Back
-              </button>
             </div>
           </div>
         </div>
